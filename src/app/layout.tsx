@@ -1,9 +1,10 @@
 import { cookies } from "next/headers";
 import { SidebarProvider } from "@/context/SidebarContext";
+import { SessionProvider } from "@/context/SessionContext";
 import "@/styles/global.css";
 import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
-import MainLayout from "@/components/layout/MainLayout"
+import MainLayout from "@/components/layout/MainLayout";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,7 +34,9 @@ export default async function RootLayout({
         />
         {isLoggedIn ? (
           <SidebarProvider>
-            <MainLayout>{children}</MainLayout>
+            <SessionProvider sessionToken={sessionToken}>
+              <MainLayout>{children}</MainLayout>
+            </SessionProvider>
           </SidebarProvider>
         ) : (
           <main>{children}</main>

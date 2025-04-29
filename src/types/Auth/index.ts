@@ -13,4 +13,7 @@ export type User = {
   provid2: number;
   percxp: "S" | "N";
   perfac: "S" | "N";
+  codar1: number;
+  codar2: number;
+  desare: string;
 };

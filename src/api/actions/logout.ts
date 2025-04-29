@@ -9,11 +9,5 @@ export async function logoutAction() {
     path: "/",
     expires: new Date(0),
   });
-
-  (await cookieStore).set("username", "", {
-    path: "/",
-    expires: new Date(0),
-  });
-
   return { success: true };
 }

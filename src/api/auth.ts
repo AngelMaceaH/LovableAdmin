@@ -8,7 +8,7 @@ export async function loginUser(
   try {
     const res = await api.post("access", { user, password });
     return res.data;
-  } catch (err: any) {
+  } catch {
     return {
       success: false,
       message: "El usuario y/o contraseña incorrectos",
