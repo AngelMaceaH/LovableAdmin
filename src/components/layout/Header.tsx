@@ -1,7 +1,7 @@
 "use client";
 
 import { useSidebar } from "@/context/SidebarContext";
-import { logoutAction } from "@/api/actions/logout";
+import { logoutAction } from "@/api/access/actions/logout";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSession } from "@/context/SessionContext";

@@ -4,13 +4,33 @@ import { useSidebar } from "@/context/SidebarContext";
 import Link from "next/link";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faUserCog, faBars, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-
+import {
+  faHome,
+  faUserCog,
+  faBars,
+  IconDefinition,
+} from "@fortawesome/free-solid-svg-icons";
+import { useSession } from "@/context/SessionContext";
+import { menuAction } from "@/api/access/actions/menu";
+import { useEffect } from "react";
 export default function Sidebar() {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  const { sessionToken } = useSession();
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+  useEffect(() => {
+    if (!sessionToken) return;
+    const fetchMenu = async () => {
+      const result = await menuAction(sessionToken.value);
+      if (!result.success) {
+        console.error(result.message);
+        return;
+      }
+      console.log(result.data);
+    };
+    fetchMenu();
+  }, [sessionToken]);
   return (
     <aside
       className={`bg-slate-700 fixed top-0 left-0 h-full z-40 transform transition-transform duration-300 ease-in-out ${

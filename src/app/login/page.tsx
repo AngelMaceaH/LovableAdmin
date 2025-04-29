@@ -18,7 +18,7 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
-import { loginAction } from "@/api/actions/login";
+import { loginAction } from "@/api/access/actions/login";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 

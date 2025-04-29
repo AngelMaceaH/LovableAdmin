@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { loginUser } from "@/api/auth";
+import { loginUser } from "@/api/access/auth";
 export async function loginAction(user: string, password: string) {
   const result = await loginUser(user, password);
   if (!result.success || !result.token) {
