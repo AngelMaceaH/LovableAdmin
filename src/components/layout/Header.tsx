@@ -1,7 +1,8 @@
 "use client";
-
-import { useState } from "react";
+import { useSidebar } from "@/context/SidebarContext";
+import { logoutAction } from "@/api/actions/logout";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useRouter } from "next/navigation";
 import {
   faSignOutAlt,
   faChevronDown,
@@ -10,15 +11,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
-type HeaderProps = {
-  isSidebarOpen: boolean;
-  setIsSidebarOpen: (isOpen: boolean) => void;
-};
-
-export default function Header({
-  isSidebarOpen,
-  setIsSidebarOpen,
-}: HeaderProps) {
+export default function Header() {
+  const router = useRouter();
+  const handleLogout = async () => {
+    await logoutAction();
+    router.push("/login");
+  };
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
   return (
     <header className="bg-slate-100 shadow-md">
       <div className="px-4 py-4 flex justify-between items-center gap-8">
@@ -27,7 +26,7 @@ export default function Header({
             console.log("CLIC");
             setIsSidebarOpen(!isSidebarOpen);
           }}
-          className="text-gray-700 hover:text-blue-600 transition"
+          className="text-gray-700 hover:text-blue-600 transition cursor-pointer"
         >
           <FontAwesomeIcon icon={faBars} className="w-6 h-6" />
         </button>
@@ -74,13 +73,13 @@ export default function Header({
 
           {/* Logout */}
           <nav>
-            <Link
-              href="/logout"
+            <button
+              onClick={handleLogout}
               className="flex items-center space-x-2 text-gray-600 hover:text-red-600"
             >
               <FontAwesomeIcon icon={faSignOutAlt} className="w-5 h-5" />
               <span>Cerrar sesión</span>
-            </Link>
+            </button>
           </nav>
         </div>
       </div>

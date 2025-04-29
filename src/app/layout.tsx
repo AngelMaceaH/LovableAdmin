@@ -1,32 +1,43 @@
-"use client";
+import { cookies } from "next/headers";
+import { SidebarProvider } from "@/context/SidebarContext";
 import "@/styles/global.css";
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
-import Footer from "@/components/Footer";
-import { useState } from "react";
+import { Inter } from "next/font/google";
+import { Toaster } from "react-hot-toast";
+import MainLayout from "@/components/layout/MainLayout"
 
-export default function RootLayout({
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const sessionToken = (await cookies()).get("session-token");
+  const isLoggedIn = !!sessionToken;
+
   return (
-    <html lang="es" className="dark">
-      <body className="flex min-h-screen bg-gray-100">
-        <Sidebar isSidebarOpen={isSidebarOpen} />
-        <div
-          className={`flex flex-col flex-1 min-h-screen ml-0 ${
-            isSidebarOpen ? "ml-64" : ""
-          }`}
-        >
-          <Header
-            isSidebarOpen={isSidebarOpen}
-            setIsSidebarOpen={setIsSidebarOpen}
-          />
-          <main className="flex-1 p-4">{children}</main>
-          <Footer />
-        </div>
+    <html lang="es" className={inter.variable}>
+      <body className="bg-gray-100 font-sans min-h-screen">
+        <Toaster
+          position="bottom-center"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "#1e293b",
+              color: "#f8fafc",
+            },
+          }}
+        />
+        {isLoggedIn ? (
+          <SidebarProvider>
+            <MainLayout>{children}</MainLayout>
+          </SidebarProvider>
+        ) : (
+          <main>{children}</main>
+        )}
       </body>
     </html>
   );
