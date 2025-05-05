@@ -23,7 +23,7 @@ export default async function RootLayout({
     <html lang="es" className={inter.variable}>
       <body className="bg-gray-100 font-sans min-h-screen">
         <Toaster
-          position="bottom-center"
+          position="top-center"
           toastOptions={{
             duration: 4000,
             style: {

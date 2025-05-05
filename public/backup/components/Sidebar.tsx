@@ -4,13 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
 import {
   faBars,
-  faFolder,
-  faFolderOpen,
-  faCircle,
+  faChevronDown,
+  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
 import useSWR from "swr";
@@ -18,6 +15,7 @@ import toast from "react-hot-toast";
 import { useSidebar } from "@/context/SidebarContext";
 import { useSession } from "@/context/SessionContext";
 import { fetchMenu } from "@/api/access/actions/menu";
+
 export default function Sidebar() {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
   const { sessionToken } = useSession();
@@ -46,26 +44,21 @@ export default function Sidebar() {
 
   const handleToggleModule = (moduleId: number) => {
     setOpenModules((prev) => {
-      const next = new Set<number>();
-      if (!prev.has(moduleId)) {
-        next.add(moduleId);
-      }
+      const next = new Set(prev);
+      if (next.has(moduleId)) next.delete(moduleId);
+      else next.add(moduleId);
       return next;
     });
-    setOpenSubModules(new Set());
   };
-
   const handleToggleSubmodule = (moduleId: number, subId: number) => {
     const key = `${moduleId}-${subId}`;
     setOpenSubModules((prev) => {
-      const next = new Set<string>();
-      if (!prev.has(key)) {
-        next.add(key);
-      }
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   };
-
   return (
     <>
       {isSidebarOpen && (
@@ -79,7 +72,7 @@ export default function Sidebar() {
       <aside
         ref={sidebarRef}
         className={clsx(
-          "bg-slate-700 fixed top-0 left-0 h-full z-40 w-full md:w-64 transform transition-transform duration-300 flex flex-col",
+          "bg-slate-700 fixed top-0 left-0 h-full z-40 w-full md:w-64 transform transition-transform duration-300",
           {
             "-translate-x-full": !isSidebarOpen,
             "translate-x-0": isSidebarOpen,
@@ -88,63 +81,42 @@ export default function Sidebar() {
       >
         <div className="flex items-center justify-between px-4 py-6 border-b border-slate-600">
           <div className="relative w-full h-11">
-            <Link href={"/"}>
-              <Image
-                src="/img/logo_white.svg"
-                alt="Logo"
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-contain"
-              />
-            </Link>
+            <Image
+              src="/img/logo_dark.webp"
+              alt="Logo"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-contain"
+            />
           </div>
           <button
             onClick={toggleSidebar}
-            className="text-gray-300 hover:text-indigo-400 md:hidden"
+            className="text-gray-300 hover:text-blue-400 md:hidden"
             aria-label="Cerrar menú"
           >
-            <FontAwesomeIcon icon={faBars} className="w-6 h-6 text-lg" />
+            <FontAwesomeIcon icon={faBars} className="w-6 h-6" />
           </button>
         </div>
         <nav
           aria-label="Main navigation"
-          className="flex-1 overflow-y-auto p-3 space-y-1 bg-slate-800"
+          className="flex flex-col p-4 space-y-1"
         >
-          {!data &&
-            Array.from({ length: 10 }).map((_, i) => (
-              <Skeleton
-                key={i}
-                height={56} 
-                borderRadius={8} 
-                style={{ marginBottom: 8 }} 
-                baseColor="rgba(255,255,255,0.1)" 
-                highlightColor="rgba(255,255,255,0.2)" 
-              />
-            ))}
-
+          {!data && <div className="text-gray-300 p-2">Cargando menú...</div>}
           {data?.map((mod) => {
             const isOpenMod = openModules.has(mod.module);
             return (
               <div key={mod.module}>
                 <button
                   onClick={() => handleToggleModule(mod.module)}
-                  className={clsx(
-                    "w-full flex items-center px-4 py-2 rounded-md transition-colors h-14 focus:outline-none focus:ring-2 focus:ring-indigo-500",
-                    isOpenMod
-                      ? "bg-indigo-700 hover:bg-indigo-600 text-white"
-                      : "bg-slate-700 hover:bg-slate-600 text-gray-200"
-                  )}
+                  className="w-full flex justify-between items-center px-4 py-2 text-gray-300 hover:bg-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                 >
+                  <span>{mod.description}</span>
                   <FontAwesomeIcon
-                    icon={isOpenMod ? faFolderOpen : faFolder}
-                    className="w-4 h-4 flex-shrink-0"
+                    icon={isOpenMod ? faChevronDown : faChevronRight}
+                    className="w-4 h-4"
                   />
-                  <span className="ml-3 flex-1 text-left text-sm">
-                    {mod.description}
-                  </span>
                 </button>
 
-                {/* Submódulos */}
                 {isOpenMod && (
                   <div className="mt-1 space-y-1">
                     {mod.subModules.map((sub) => {
@@ -156,42 +128,26 @@ export default function Sidebar() {
                             onClick={() =>
                               handleToggleSubmodule(mod.module, sub.subModule)
                             }
-                            className={clsx(
-                              "w-full flex items-center px-6 py-2 rounded-md transition-colors h-14 focus:outline-none focus:ring-2 focus:ring-indigo-500",
-                              isOpenSub
-                                ? "bg-indigo-600 hover:bg-indigo-500 text-white"
-                                : "bg-slate-600 hover:bg-slate-500 text-gray-200"
-                            )}
+                            className="w-full flex justify-between items-center px-6 py-2 text-gray-300 hover:bg-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                           >
+                            <span>{sub.description}</span>
                             <FontAwesomeIcon
-                              icon={isOpenSub ? faFolderOpen : faFolder}
-                              className="w-3 h-3 flex-shrink-0"
+                              icon={isOpenSub ? faChevronDown : faChevronRight}
+                              className="w-3 h-3"
                             />
-                            <span className="ml-3 flex-1 text-left text-sm">
-                              {sub.description}
-                            </span>
                           </button>
 
-                          {/* Programas */}
                           {isOpenSub && (
-                            <div className="mt-1 space-y-1">
+                            <div className="mt-1">
                               {sub.programs.map((prog) => (
-                                <div
+                                <Link
                                   key={prog.id}
-                                  className="flex items-center px-8 py-1 bg-indigo-500  text-gray-100 rounded-md transition-colors hover:bg-indigo-700 h-14 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                  href={`/program/${prog.id}`}
+                                  onClick={toggleSidebar}
+                                  className="block px-10 py-1 text-gray-300 hover:text-blue-400 hover:bg-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 >
-                                  <FontAwesomeIcon
-                                    icon={faCircle}
-                                    className="w-2 h-2 flex-shrink-0"
-                                  />
-                                  <Link
-                                    href={`/program/${prog.id}`}
-                                    onClick={toggleSidebar}
-                                    className="ml-3 w-40 font-medium hover:text-white transition-colors text-xs "
-                                  >
-                                    {prog.description}
-                                  </Link>
-                                </div>
+                                  {prog.description}
+                                </Link>
                               ))}
                             </div>
                           )}

@@ -1,10 +1,10 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { menu } from "@/api/access/auth";
+import { menu } from "@/api/access/menu";
+import { ApiMenuItem } from "@/types/Menu";
 export async function menuAction(token: string) {
   const result = await menu(token);
-  console.log(result);
   if (!result.success) {
     return {
       success: false,
@@ -17,3 +17,13 @@ export async function menuAction(token: string) {
     data: result.data,
   };
 }
+
+export const fetchMenu = async ([_key, token]: [string, string]): Promise<
+  ApiMenuItem[]
+> => {
+  const result = await menuAction(token);
+  if (!result.success) {
+    throw new Error(result.message);
+  }
+  return result.data as ApiMenuItem[];
+};
